@@ -1,0 +1,3044 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pokémon UNITE｜バトルポケモンルーレット</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    "Noto Sans JP",
+    sans-serif;
+  color: #18243a;
+
+  background:
+    radial-gradient(
+      circle at 10% 15%,
+      rgba(255,170,65,.28) 0 100px,
+      transparent 101px
+    ),
+    radial-gradient(
+      circle at 90% 80%,
+      rgba(45,150,225,.25) 0 150px,
+      transparent 151px
+    ),
+    linear-gradient(
+      135deg,
+      #edf7ff 0%,
+      #dcefff 50%,
+      #f8fbff 100%
+    );
+
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: .28;
+
+  background:
+    linear-gradient(
+      135deg,
+      transparent 0 48%,
+      rgba(255,255,255,.8) 49% 50%,
+      transparent 51%
+    ) 0 0 / 90px 90px,
+    linear-gradient(
+      45deg,
+      transparent 0 48%,
+      rgba(80,150,200,.25) 49% 50%,
+      transparent 51%
+    ) 0 0 / 90px 90px;
+}
+
+.app {
+  width: min(820px, 94vw);
+  margin: 30px auto;
+  background: rgba(255,255,255,.96);
+  border: 1px solid rgba(255,255,255,.9);
+  border-radius: 26px;
+  box-shadow: 0 24px 70px rgba(20,70,110,.22);
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+/* =========================================================
+   ロビー風タイトル
+========================================================= */
+
+.lobby-header {
+  padding: 22px 25px 20px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #103b65 0%,
+      #1d6fa5 57%,
+      #ee8a25 57%,
+      #f39a2f 100%
+    );
+
+  position: relative;
+  overflow: hidden;
+
+  box-shadow:
+    inset 0 -4px rgba(255,255,255,.15);
+}
+
+.lobby-header::before {
+  content: "";
+
+  position: absolute;
+
+  width: 300px;
+  height: 300px;
+
+  right: -100px;
+  top: -180px;
+
+  transform: rotate(25deg);
+
+  background:
+    rgba(255,255,255,.08);
+}
+
+.lobby-header::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      120deg,
+      transparent 0 42%,
+      rgba(255,255,255,.17) 42.5% 44%,
+      transparent 44.5% 100%
+    );
+}
+
+.lobby-label {
+  display: inline-block;
+  position: relative;
+  z-index: 2;
+
+  padding: 5px 12px;
+  margin-bottom: 8px;
+
+  border: 1px solid rgba(255,255,255,.45);
+  border-radius: 6px;
+
+  background: rgba(5,40,70,.45);
+
+  color: white;
+
+  font-size: 10px;
+  font-weight: 1000;
+  letter-spacing: 2px;
+}
+
+h1 {
+  margin: 0;
+
+  position: relative;
+  z-index: 2;
+
+  color: white;
+
+  font-size: clamp(27px, 5vw, 45px);
+  line-height: 1.12;
+
+  font-weight: 1000;
+  letter-spacing: .04em;
+
+  text-shadow:
+    0 3px 0 #0b2d4b,
+    0 6px 14px rgba(0,0,0,.25);
+}
+
+/* =========================================================
+   本体
+========================================================= */
+
+.content {
+  padding: 24px;
+}
+
+.title-accent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  margin: 0 0 8px;
+
+  color: #2877b9;
+
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 1.7px;
+}
+
+.title-accent span {
+  width: 50px;
+  height: 2px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      #f39a3c
+    );
+}
+
+.title-accent span:last-child {
+  background:
+    linear-gradient(
+      90deg,
+      #2c8dcc,
+      transparent
+    );
+}
+
+.sub {
+  margin: 0 0 16px;
+
+  color: #60708a;
+
+  font-weight: 700;
+  text-align: center;
+}
+
+/* =========================================================
+   モード選択
+========================================================= */
+
+.mode-selector {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+
+  margin: 0 auto 18px;
+}
+
+.mode-button {
+  margin: 0;
+
+  padding: 10px 18px;
+
+  border-radius: 10px;
+
+  border: 2px solid #c8ddeb;
+
+  background: #f3f8fc;
+
+  color: #42627c;
+
+  font-size: 14px;
+  font-weight: 900;
+
+  box-shadow: none;
+
+  cursor: pointer;
+
+  transition: .15s;
+}
+
+.mode-button:hover {
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 4px 10px rgba(20,70,110,.12);
+}
+
+.mode-button.active {
+  color: white;
+
+  border-color: #1d6794;
+
+  background:
+    linear-gradient(
+      180deg,
+      #2e8dc3,
+      #17628f
+    );
+
+  box-shadow:
+    0 4px 10px rgba(23,98,143,.25);
+}
+
+/* =========================================================
+   モード表示制御
+========================================================= */
+
+/* 通常は「本日のお題」関連を非表示 */
+.challenge-mode-only {
+  display: none;
+}
+
+/* 「本日のお題」モード */
+.challenge-mode .team-mode-only {
+  display: none !important;
+}
+
+.challenge-mode .challenge-mode-only {
+  display: block;
+}
+
+/* =========================================================
+   結果表示
+========================================================= */
+
+.top-result {
+  width: min(500px, 92%);
+
+  min-height: 175px;
+
+  margin: 0 auto 18px;
+
+  padding: 8px 15px;
+
+  border: 3px solid #1d527e;
+  border-radius: 12px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff,
+      #edf7ff
+    );
+
+  box-shadow:
+    0 7px 18px rgba(23,76,122,.15),
+    inset 0 1px white;
+
+  color: #173e69;
+
+  text-align: center;
+
+  font-size: clamp(25px, 4vw, 38px);
+
+  font-weight: 1000;
+  letter-spacing: .08em;
+
+  display: flex;
+  flex-direction: column;
+
+  justify-content: center;
+  align-items: center;
+}
+
+.top-result img {
+  width: 105px;
+  height: 105px;
+
+  object-fit: contain;
+
+  margin-bottom: 0;
+
+  filter:
+    drop-shadow(
+      0 5px 6px rgba(0,0,0,.18)
+    );
+}
+
+.single-name {
+  font-size: 22px;
+  line-height: 1.15;
+  margin-top: -2px;
+}
+
+/* =========================================================
+   ルーレット
+========================================================= */
+
+.wheel-wrap {
+  position: relative;
+
+  width: min(400px, 68vw);
+
+  aspect-ratio: 1;
+
+  margin: 0 auto 20px;
+}
+
+#wheel {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  border-radius: 50%;
+
+  box-shadow:
+    0 13px 30px rgba(20,70,110,.25),
+    inset 0 0 0 7px white,
+    inset 0 0 0 10px #173e69;
+}
+
+.pointer {
+  position: absolute;
+
+  top: -8px;
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  width: 0;
+  height: 0;
+
+  border-left: 16px solid transparent;
+  border-right: 16px solid transparent;
+  border-top: 34px solid #ed7d21;
+
+  filter:
+    drop-shadow(
+      0 3px 2px rgba(0,0,0,.25)
+    );
+
+  z-index: 5;
+}
+
+.pointer::after {
+  content: "";
+
+  position: absolute;
+
+  width: 11px;
+  height: 11px;
+
+  border-radius: 50%;
+
+  background: white;
+
+  top: -31px;
+  left: -5.5px;
+}
+
+/* =========================================================
+   ルーレットボタン
+========================================================= */
+
+#spin {
+  display: block;
+
+  margin: 0 auto;
+
+  border: 0;
+  border-radius: 12px;
+
+  padding: 14px 34px;
+
+  color: white;
+
+  font-size: 19px;
+  font-weight: 1000;
+  letter-spacing: .04em;
+
+  cursor: pointer;
+
+  background:
+    linear-gradient(
+      180deg,
+      #f39a32,
+      #e66c19
+    );
+
+  box-shadow:
+    0 7px 0 #b94e13,
+    0 12px 24px rgba(215,106,38,.22);
+
+  transition:
+    transform .08s,
+    box-shadow .08s;
+}
+
+#spin:hover {
+  transform: translateY(-1px);
+}
+
+#spin:active {
+  transform: translateY(3px);
+
+  box-shadow:
+    0 4px 0 #b94e13,
+    0 7px 14px rgba(215,106,38,.22);
+}
+
+#spin:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* =========================================================
+   選出ポケモン
+========================================================= */
+
+.team-board {
+  margin-top: 26px;
+
+  padding: 18px;
+
+  border-radius: 15px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #0d3557,
+      #1d6793
+    );
+
+  border: 2px solid rgba(255,255,255,.5);
+
+  box-shadow:
+    inset 0 1px rgba(255,255,255,.45),
+    0 10px 24px rgba(23,61,91,.25);
+
+  position: relative;
+
+  overflow: hidden;
+}
+
+.team-board::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+  right: 0;
+
+  height: 4px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #f3982f,
+      #ffffff,
+      #2d91c9
+    );
+}
+
+.team-title {
+  color: white;
+
+  font-size: 20px;
+  font-weight: 1000;
+
+  letter-spacing: .06em;
+
+  margin-bottom: 15px;
+
+  text-align: left;
+
+  text-shadow:
+    0 2px 2px rgba(0,0,0,.25);
+}
+
+.team-title small {
+  margin-left: 8px;
+
+  font-size: 9px;
+
+  letter-spacing: 1.5px;
+
+  opacity: .7;
+}
+
+.history-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(5, minmax(0, 1fr));
+
+  gap: 9px;
+}
+
+/* =========================================================
+   ポケモンカード
+========================================================= */
+
+.history-item {
+  min-height: 180px;
+
+  padding: 11px 7px;
+
+  border-radius: 12px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff,
+      #e8f3fa
+    );
+
+  border: 2px solid #c6dbe9;
+
+  box-shadow:
+    inset 0 1px white,
+    0 5px 12px rgba(6,46,74,.22);
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  position: relative;
+
+  overflow: hidden;
+}
+
+.history-item::before {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  top: 0;
+  bottom: 0;
+
+  width: 5px;
+
+  background:
+    linear-gradient(
+      #f3982f,
+      #2d91c9
+    );
+}
+
+.history-item::after {
+  content: "";
+
+  position: absolute;
+
+  width: 70px;
+  height: 70px;
+
+  right: -25px;
+  top: -25px;
+
+  border-radius: 50%;
+
+  background:
+    rgba(45,145,201,.08);
+}
+
+.history-item .num {
+  font-size: 10px;
+
+  color: #42627c;
+
+  font-weight: 1000;
+
+  letter-spacing: .8px;
+
+  margin-bottom: 5px;
+}
+
+.pokemon-icon {
+  width: 72px;
+  height: 72px;
+
+  object-fit: contain;
+
+  margin: 2px 0 3px;
+
+  filter:
+    drop-shadow(
+      0 4px 4px rgba(0,0,0,.15)
+    );
+
+  position: relative;
+
+  z-index: 1;
+}
+
+.role-badge {
+  display: inline-block;
+
+  margin: 2px auto 5px;
+
+  padding: 3px 8px;
+
+  border-radius: 999px;
+
+  font-size: 9px;
+
+  font-weight: 1000;
+
+  white-space: nowrap;
+}
+
+.role-badge.attacker {
+  background: #ffe0e5;
+  color: #c6284a;
+}
+
+.role-badge.defender {
+  background: #dceeff;
+  color: #1767a8;
+}
+
+.role-badge.supporter {
+  background: #e2f7df;
+  color: #33852c;
+}
+
+.role-badge.speedster {
+  background: #eee2ff;
+  color: #7540a8;
+}
+
+.role-badge.allrounder {
+  background: #fff0cf;
+  color: #a56600;
+}
+
+.history-item .name {
+  color: #1d2b42;
+
+  font-size: 13px;
+
+  font-weight: 1000;
+
+  line-height: 1.25;
+
+  text-align: center;
+
+  word-break: keep-all;
+}
+
+/* =========================================================
+   5回終了メッセージ
+========================================================= */
+
+.complete-message {
+  display: none;
+
+  margin-top: 15px;
+
+  padding: 10px;
+
+  border-radius: 8px;
+
+  background: rgba(255,255,255,.13);
+
+  color: white;
+
+  font-size: 12px;
+
+  font-weight: 800;
+
+  text-align: center;
+}
+
+/* =========================================================
+   本日のチャレンジ
+========================================================= */
+
+.challenge-section {
+  margin-top: 10px;
+}
+
+.challenge-button {
+  display: block;
+
+  width: min(420px, 92%);
+
+  margin: 0 auto 20px;
+
+  padding: 15px 24px;
+
+  border: 0;
+
+  border-radius: 12px;
+
+  color: white;
+
+  font-size: 19px;
+
+  font-weight: 1000;
+
+  letter-spacing: .04em;
+
+  cursor: pointer;
+
+  background:
+    linear-gradient(
+      180deg,
+      #f39a32,
+      #e66c19
+    );
+
+  box-shadow:
+    0 7px 0 #b94e13,
+    0 12px 24px rgba(215,106,38,.22);
+
+  transition:
+    transform .08s,
+    box-shadow .08s;
+}
+
+.challenge-button:hover {
+  transform: translateY(-1px);
+}
+
+.challenge-button:active {
+  transform: translateY(3px);
+
+  box-shadow:
+    0 4px 0 #b94e13,
+    0 7px 14px rgba(215,106,38,.22);
+}
+
+.challenge-result {
+  width: min(680px, 96%);
+
+  margin: 0 auto;
+
+  padding: 24px 20px;
+
+  border-radius: 18px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff,
+      #eef7ff
+    );
+
+  border: 3px solid #1d6794;
+
+  box-shadow:
+    0 12px 30px rgba(20,70,110,.18);
+
+  color: #173e69;
+}
+
+.challenge-result:empty {
+  display: none;
+}
+
+.challenge-heading {
+  text-align: center;
+
+  margin-bottom: 18px;
+}
+
+.challenge-label {
+  display: inline-block;
+
+  margin-bottom: 8px;
+
+  padding: 5px 12px;
+
+  border-radius: 999px;
+
+  background: #e3f1fb;
+
+  color: #17628f;
+
+  font-size: 11px;
+
+  font-weight: 1000;
+
+  letter-spacing: 1.5px;
+}
+
+.challenge-title {
+  font-size: clamp(25px, 5vw, 36px);
+
+  font-weight: 1000;
+
+  line-height: 1.25;
+
+  color: #173e69;
+
+  text-shadow:
+    0 2px 0 rgba(255,255,255,.9);
+}
+
+.challenge-category {
+  text-align: center;
+
+  margin-top: 8px;
+
+  color: #60708a;
+
+  font-size: 12px;
+
+  font-weight: 900;
+}
+
+.challenge-pokemon-title {
+  margin: 20px 0 10px;
+
+  padding-bottom: 7px;
+
+  border-bottom: 2px solid #c8ddeb;
+
+  color: #2877b9;
+
+  font-size: 15px;
+
+  font-weight: 1000;
+}
+
+.challenge-pokemon-list {
+  display: grid;
+
+  grid-template-columns:
+    repeat(5, minmax(0, 1fr));
+
+  gap: 8px;
+}
+
+.challenge-pokemon {
+  min-height: 100px;
+
+  padding: 8px 5px;
+
+  border-radius: 10px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff,
+      #eaf4fa
+    );
+
+  border: 1px solid #c8ddeb;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  text-align: center;
+}
+
+.challenge-pokemon img {
+  width: 62px;
+  height: 62px;
+
+  object-fit: contain;
+
+  filter:
+    drop-shadow(
+      0 3px 3px rgba(0,0,0,.14)
+    );
+}
+
+.challenge-pokemon span {
+  margin-top: 2px;
+
+  font-size: 11px;
+
+  line-height: 1.2;
+
+  font-weight: 1000;
+}
+
+/* =========================================================
+   レアチャレンジ
+========================================================= */
+
+.challenge-result.rare-challenge {
+  border: 3px solid #d9a400;
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(255,228,91,.45),
+      transparent 45%
+    ),
+    linear-gradient(
+      145deg,
+      #fffdf0,
+      #fff4bd
+    );
+
+  box-shadow:
+    0 0 0 4px rgba(255,211,52,.18),
+    0 14px 40px rgba(211,164,0,.28);
+}
+
+.legend-banner {
+  text-align: center;
+
+  margin-bottom: 15px;
+
+  color: #a36b00;
+
+  font-size: clamp(19px, 4vw, 28px);
+
+  font-weight: 1000;
+
+  letter-spacing: .08em;
+
+  text-shadow:
+    0 1px 0 white,
+    0 2px 5px rgba(166,116,0,.22);
+}
+
+.rare-challenge .challenge-title {
+  color: #8c6100;
+}
+
+/* =========================================================
+   スマホ
+========================================================= */
+
+@media (max-width: 650px) {
+
+  .app {
+    width: 96vw;
+
+    margin: 12px auto;
+
+    border-radius: 20px;
+  }
+
+  .lobby-header {
+    border-radius: 20px 20px 0 0;
+
+    padding: 18px;
+  }
+
+  .content {
+    padding: 18px;
+  }
+
+  .history-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .history-item:last-child {
+    grid-column: 1 / -1;
+
+    max-width: 48%;
+
+    width: 48%;
+
+    justify-self: center;
+  }
+
+  .pokemon-icon {
+    width: 66px;
+    height: 66px;
+  }
+
+  .wheel-wrap {
+    width: min(350px, 75vw);
+  }
+
+  .challenge-pokemon-list {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+}
+
+@media (max-width: 420px) {
+
+  .history-grid {
+    gap: 7px;
+  }
+
+  .history-item {
+    min-height: 165px;
+  }
+
+  .pokemon-icon {
+    width: 58px;
+    height: 58px;
+  }
+
+  .history-item .name {
+    font-size: 12px;
+  }
+
+  .mode-button {
+    padding: 9px 13px;
+
+    font-size: 12px;
+  }
+
+  .challenge-button {
+    font-size: 16px;
+  }
+
+  .challenge-result {
+    padding: 18px 12px;
+  }
+
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- =====================================================
+       ロビー風タイトル
+  ====================================================== -->
+
+  <div class="lobby-header">
+
+    <div class="lobby-label">
+      BATTLE LOBBY
+    </div>
+
+    <h1>
+      ⚡ <span class="unite">Pokémon UNITE</span><br>
+      バトルポケモン ルーレット
+    </h1>
+
+  </div>
+
+  <div class="content">
+
+    <div class="title-accent">
+      <span></span>
+      <b>RANDOM BATTLE PICK</b>
+      <span></span>
+    </div>
+
+    <p class="sub">
+      今日使うポケモンをランダムで決めよう！
+    </p>
+
+    <!-- =================================================
+         モード選択
+    ================================================== -->
+
+    <div class="mode-selector" role="tablist" aria-label="ゲームモード">
+
+      <button
+        id="modeTeam"
+        class="mode-button active"
+        type="button"
+        aria-selected="true"
+      >
+        👥 5人選出
+      </button>
+
+      <button
+        id="modeChallenge"
+        class="mode-button"
+        type="button"
+        aria-selected="false"
+      >
+        🔥 本日のお題
+      </button>
+
+    </div>
+
+    <!-- =================================================
+         5人選出モード
+    ================================================== -->
+
+    <div
+      id="topResult"
+      class="top-result team-mode-only"
+    >
+      ？？？
+    </div>
+
+    <div class="wheel-wrap team-mode-only">
+
+      <div class="pointer"></div>
+
+      <canvas id="wheel"></canvas>
+
+    </div>
+
+    <button
+      id="spin"
+      class="team-mode-only"
+      type="button"
+    >
+      🎲 ルーレットを回す！
+    </button>
+
+    <div
+      id="teamBoard"
+      class="team-board team-mode-only"
+    >
+
+      <div class="team-title">
+        選出ポケモン
+        <small>YOUR TEAM</small>
+      </div>
+
+      <div
+        id="historyList"
+        class="history-grid"
+      ></div>
+
+      <div
+        id="completeMessage"
+        class="complete-message"
+      >
+        5回の選出が完了しました！<br>
+        次の抽選では全キャラクターから再スタートします。
+      </div>
+
+    </div>
+
+    <!-- =================================================
+         本日のお題モード
+    ================================================== -->
+
+    <section
+      class="challenge-section challenge-mode-only"
+    >
+
+      <button
+        id="challengeButton"
+        class="challenge-button"
+        type="button"
+      >
+        🔥 本日のチャレンジ
+      </button>
+
+      <div
+        id="challengeResult"
+        class="challenge-result"
+      ></div>
+
+    </section>
+
+  </div>
+
+</div>
+
+<script>
+
+/* =========================================================
+   ポケモン一覧
+========================================================= */
+
+const pokemon = [
+
+  "ソルガレオ",
+  "レシラム",
+  "パルキア",
+  "イベルタル",
+
+  "ウェーニバル",
+  "ラウドボーン",
+  "メガニウム",
+  "オーダイル",
+  "バクフーン",
+
+  "フリーザー",
+  "ファイヤー",
+  "サンダー",
+
+  "ネギガナイト",
+  "ニャース",
+
+  "メガリザードンY",
+  "メガギャラドス",
+  "シャワーズ",
+  "ダダリン",
+  "メガリザードンX",
+  "メガルカリオ",
+
+  "エンペルト",
+  "パーモット",
+  "ラティアス",
+  "ラティオス",
+  "マホイップ",
+  "アローラライチュウ",
+
+  "スイクン",
+  "ガラルギャロップ",
+  "デカヌチャン",
+  "コダック",
+  "ダークライ",
+  "グレンアルマ",
+
+  "ホウオウ",
+  "ソウブレイズ",
+  "タイレーツ",
+  "ミライドン",
+  "ギャラドス",
+  "メタグロス",
+  "マスカーニャ",
+  "ミミッキュ",
+  "バシャーモ",
+
+  "ミュウツーX",
+  "ミュウツーY",
+
+  "インテレオン",
+  "リーフィア",
+  "ブラッキー",
+  "シャンデラ",
+  "ラプラス",
+  "ヌメルゴン",
+  "ザシアン",
+  "キュワワー",
+  "ドラパルト",
+  "ウーラオス",
+  "ヤミラミ",
+  "ゾロアーク",
+  "ピクシー",
+
+  "ハッサム",
+  "ドードリオ",
+  "ミュウ",
+  "バンギラス",
+  "マッシブーン",
+  "グレイシア",
+  "マフォクシー",
+  "エーフィ",
+
+  "マリルリ",
+  "ジュラルドン",
+  "フーパ",
+  "ギルガルド",
+  "オーロット",
+  "カイリュー",
+  "アマージョ",
+  "ジュナイパー",
+
+  "ヨクバリス",
+  "ニンフィア",
+  "マンムー",
+  "カメックス",
+  "ハピナス",
+  "サーナイト",
+  "アブソル",
+  "アローラキュウコン",
+
+  "イワパレス",
+  "ウッウ",
+  "エースバーン",
+  "カイリキー",
+  "カビゴン",
+  "ゲッコウガ",
+  "ファイアロー",
+  "ガブリアス",
+  "ゲンガー",
+  "ピカチュウ",
+  "リザードン",
+  "フシギバナ",
+  "ルカリオ",
+  "バリヤード",
+  "ヤドラン",
+  "プクリン"
+
+];
+
+/* =========================================================
+   ロール
+========================================================= */
+
+const roles = {
+
+  "ソルガレオ":"バランス型",
+  "レシラム":"アタッカー",
+  "パルキア":"バランス型",
+  "イベルタル":"アタッカー",
+
+  "ウェーニバル":"バランス型",
+  "ラウドボーン":"アタッカー",
+  "メガニウム":"サポート型",
+  "オーダイル":"バランス型",
+  "バクフーン":"アタッカー",
+
+  "フリーザー":"ディフェンダー",
+  "ファイヤー":"バランス型",
+  "サンダー":"アタッカー",
+
+  "ネギガナイト":"バランス型",
+  "ニャース":"スピード型",
+
+  "メガリザードンY":"バランス型",
+  "メガギャラドス":"バランス型",
+  "シャワーズ":"ディフェンダー",
+  "ダダリン":"バランス型",
+  "メガリザードンX":"バランス型",
+  "メガルカリオ":"バランス型",
+
+  "エンペルト":"バランス型",
+  "パーモット":"バランス型",
+  "ラティアス":"サポート型",
+  "ラティオス":"アタッカー",
+  "マホイップ":"サポート型",
+  "アローラライチュウ":"アタッカー",
+
+  "スイクン":"バランス型",
+  "ガラルギャロップ":"スピード型",
+  "デカヌチャン":"バランス型",
+  "コダック":"サポート型",
+  "ダークライ":"スピード型",
+  "グレンアルマ":"アタッカー",
+
+  "ホウオウ":"ディフェンダー",
+  "ソウブレイズ":"バランス型",
+  "タイレーツ":"バランス型",
+  "ミライドン":"アタッカー",
+  "ギャラドス":"バランス型",
+  "メタグロス":"バランス型",
+  "マスカーニャ":"スピード型",
+  "ミミッキュ":"バランス型",
+  "バシャーモ":"バランス型",
+
+  "ミュウツーX":"バランス型",
+  "ミュウツーY":"アタッカー",
+
+  "インテレオン":"アタッカー",
+  "リーフィア":"スピード型",
+  "ブラッキー":"ディフェンダー",
+  "シャンデラ":"アタッカー",
+  "ラプラス":"ディフェンダー",
+  "ヌメルゴン":"ディフェンダー",
+  "ザシアン":"バランス型",
+  "キュワワー":"サポート型",
+  "ドラパルト":"アタッカー",
+  "ウーラオス":"バランス型",
+  "ヤミラミ":"サポート型",
+  "ゾロアーク":"スピード型",
+  "ピクシー":"サポート型",
+
+  "ハッサム":"バランス型",
+  "ドードリオ":"スピード型",
+  "ミュウ":"アタッカー",
+  "バンギラス":"バランス型",
+  "マッシブーン":"バランス型",
+  "グレイシア":"アタッカー",
+  "マフォクシー":"アタッカー",
+  "エーフィ":"アタッカー",
+
+  "マリルリ":"バランス型",
+  "ジュラルドン":"アタッカー",
+  "フーパ":"サポート型",
+  "ギルガルド":"バランス型",
+  "オーロット":"ディフェンダー",
+  "カイリュー":"バランス型",
+  "アマージョ":"バランス型",
+  "ジュナイパー":"アタッカー",
+
+  "ヨクバリス":"ディフェンダー",
+  "ニンフィア":"アタッカー",
+  "マンムー":"ディフェンダー",
+  "カメックス":"ディフェンダー",
+  "ハピナス":"サポート型",
+  "サーナイト":"アタッカー",
+  "アブソル":"スピード型",
+  "アローラキュウコン":"アタッカー",
+
+  "イワパレス":"ディフェンダー",
+  "ウッウ":"アタッカー",
+  "エースバーン":"アタッカー",
+  "カイリキー":"バランス型",
+  "カビゴン":"ディフェンダー",
+  "ゲッコウガ":"アタッカー",
+  "ファイアロー":"スピード型",
+  "ガブリアス":"バランス型",
+  "ゲンガー":"スピード型",
+  "ピカチュウ":"アタッカー",
+  "リザードン":"バランス型",
+  "フシギバナ":"アタッカー",
+  "ルカリオ":"バランス型",
+  "バリヤード":"サポート型",
+  "ヤドラン":"ディフェンダー",
+  "プクリン":"サポート型"
+
+};
+
+/* =========================================================
+   アイコン
+========================================================= */
+
+const iconNames = {
+
+  "ソルガレオ":"solgaleo",
+  "レシラム":"reshiram",
+  "パルキア":"palkia",
+  "イベルタル":"yveltal",
+
+  "ウェーニバル":"quaquaval",
+  "ラウドボーン":"skeledirge",
+  "メガニウム":"meganium",
+  "オーダイル":"feraligatr",
+  "バクフーン":"typhlosion",
+
+  "フリーザー":"articuno",
+  "ファイヤー":"moltres",
+  "サンダー":"zapdos",
+
+  "ネギガナイト":"sirfetchd",
+  "ニャース":"meowth",
+
+  "メガリザードンY":"charizard-mega-y",
+  "メガギャラドス":"gyarados-mega",
+  "シャワーズ":"vaporeon",
+  "ダダリン":"dhelmise",
+  "メガリザードンX":"charizard-mega-x",
+  "メガルカリオ":"lucario-mega",
+
+  "エンペルト":"empoleon",
+  "パーモット":"pawmot",
+  "ラティアス":"latias",
+  "ラティオス":"latios",
+  "マホイップ":"alcremie",
+  "アローラライチュウ":"raichu-alolan",
+
+  "スイクン":"suicune",
+  "ガラルギャロップ":"rapidash-galarian",
+  "デカヌチャン":"tinkaton",
+  "コダック":"psyduck",
+  "ダークライ":"darkrai",
+  "グレンアルマ":"armarouge",
+
+  "ホウオウ":"ho-oh",
+  "ソウブレイズ":"ceruledge",
+  "タイレーツ":"falinks",
+  "ミライドン":"miraidon",
+  "ギャラドス":"gyarados",
+  "メタグロス":"metagross",
+  "マスカーニャ":"meowscarada",
+  "ミミッキュ":"mimikyu",
+  "バシャーモ":"blaziken",
+
+  "ミュウツーX":"mewtwo-mega-x",
+  "ミュウツーY":"mewtwo-mega-y",
+
+  "インテレオン":"inteleon",
+  "リーフィア":"leafeon",
+  "ブラッキー":"umbreon",
+  "シャンデラ":"chandelure",
+  "ラプラス":"lapras",
+  "ヌメルゴン":"goodra",
+  "ザシアン":"zacian",
+  "キュワワー":"comfey",
+  "ドラパルト":"dragapult",
+  "ウーラオス":"urshifu",
+  "ヤミラミ":"sableye",
+  "ゾロアーク":"zoroark",
+  "ピクシー":"clefable",
+
+  "ハッサム":"scizor",
+  "ドードリオ":"dodrio",
+  "ミュウ":"mew",
+  "バンギラス":"tyranitar",
+  "マッシブーン":"buzzwole",
+  "グレイシア":"glaceon",
+  "マフォクシー":"delphox",
+  "エーフィ":"espeon",
+
+  "マリルリ":"azumarill",
+  "ジュラルドン":"duraludon",
+  "フーパ":"hoopa",
+  "ギルガルド":"aegislash",
+  "オーロット":"trevenant",
+  "カイリュー":"dragonite",
+  "アマージョ":"tsareena",
+  "ジュナイパー":"decidueye",
+
+  "ヨクバリス":"greedent",
+  "ニンフィア":"sylveon",
+  "マンムー":"mamoswine",
+  "カメックス":"blastoise",
+  "ハピナス":"blissey",
+  "サーナイト":"gardevoir",
+  "アブソル":"absol",
+  "アローラキュウコン":"ninetales-alolan",
+
+  "イワパレス":"crustle",
+  "ウッウ":"cramorant",
+  "エースバーン":"cinderace",
+  "カイリキー":"machamp",
+  "カビゴン":"snorlax",
+  "ゲッコウガ":"greninja",
+  "ファイアロー":"talonflame",
+  "ガブリアス":"garchomp",
+  "ゲンガー":"gengar",
+  "ピカチュウ":"pikachu",
+  "リザードン":"charizard",
+  "フシギバナ":"venusaur",
+  "ルカリオ":"lucario",
+  "バリヤード":"mr-mime",
+  "ヤドラン":"slowbro",
+  "プクリン":"wigglytuff"
+
+};
+
+/* =========================================================
+   タイプ
+========================================================= */
+
+const types = {
+
+  "ソルガレオ":["エスパー","はがね"],
+  "レシラム":["ドラゴン","ほのお"],
+  "パルキア":["みず","ドラゴン"],
+  "イベルタル":["あく","ひこう"],
+
+  "ウェーニバル":["みず","かくとう"],
+  "ラウドボーン":["ほのお","ゴースト"],
+  "メガニウム":["くさ"],
+  "オーダイル":["みず"],
+  "バクフーン":["ほのお"],
+
+  "フリーザー":["こおり","ひこう"],
+  "ファイヤー":["ほのお","ひこう"],
+  "サンダー":["でんき","ひこう"],
+
+  "ネギガナイト":["かくとう"],
+  "ニャース":["ノーマル"],
+
+  "メガリザードンY":["ほのお","ひこう"],
+  "メガギャラドス":["みず","あく"],
+  "シャワーズ":["みず"],
+  "ダダリン":["ゴースト","くさ"],
+  "メガリザードンX":["ほのお","ドラゴン"],
+  "メガルカリオ":["かくとう","はがね"],
+
+  "エンペルト":["みず","はがね"],
+  "パーモット":["でんき","かくとう"],
+  "ラティアス":["ドラゴン","エスパー"],
+  "ラティオス":["ドラゴン","エスパー"],
+  "マホイップ":["フェアリー"],
+  "アローラライチュウ":["でんき","エスパー"],
+
+  "スイクン":["みず"],
+  "ガラルギャロップ":["エスパー","フェアリー"],
+  "デカヌチャン":["フェアリー","はがね"],
+  "コダック":["みず"],
+  "ダークライ":["あく"],
+  "グレンアルマ":["ほのお","エスパー"],
+
+  "ホウオウ":["ほのお","ひこう"],
+  "ソウブレイズ":["ほのお","ゴースト"],
+  "タイレーツ":["かくとう"],
+  "ミライドン":["でんき","ドラゴン"],
+  "ギャラドス":["みず","ひこう"],
+  "メタグロス":["はがね","エスパー"],
+  "マスカーニャ":["くさ","あく"],
+  "ミミッキュ":["ゴースト","フェアリー"],
+  "バシャーモ":["ほのお","かくとう"],
+
+  "ミュウツーX":["エスパー","かくとう"],
+  "ミュウツーY":["エスパー"],
+
+  "インテレオン":["みず"],
+  "リーフィア":["くさ"],
+  "ブラッキー":["あく"],
+  "シャンデラ":["ゴースト","ほのお"],
+  "ラプラス":["みず","こおり"],
+  "ヌメルゴン":["ドラゴン"],
+  "ザシアン":["フェアリー","はがね"],
+  "キュワワー":["フェアリー"],
+  "ドラパルト":["ドラゴン","ゴースト"],
+  "ウーラオス":["かくとう","みず"],
+  "ヤミラミ":["あく","ゴースト"],
+  "ゾロアーク":["あく"],
+  "ピクシー":["フェアリー"],
+
+  "ハッサム":["むし","はがね"],
+  "ドードリオ":["ノーマル","ひこう"],
+  "ミュウ":["エスパー"],
+  "バンギラス":["いわ","あく"],
+  "マッシブーン":["むし","かくとう"],
+  "グレイシア":["こおり"],
+  "マフォクシー":["ほのお","エスパー"],
+  "エーフィ":["エスパー"],
+
+  "マリルリ":["みず","フェアリー"],
+  "ジュラルドン":["はがね","ドラゴン"],
+  "フーパ":["エスパー","ゴースト"],
+  "ギルガルド":["はがね","ゴースト"],
+  "オーロット":["ゴースト","くさ"],
+  "カイリュー":["ドラゴン","ひこう"],
+  "アマージョ":["くさ"],
+  "ジュナイパー":["くさ","ゴースト"],
+
+  "ヨクバリス":["ノーマル"],
+  "ニンフィア":["フェアリー"],
+  "マンムー":["こおり","じめん"],
+  "カメックス":["みず"],
+  "ハピナス":["ノーマル"],
+  "サーナイト":["エスパー","フェアリー"],
+  "アブソル":["あく"],
+  "アローラキュウコン":["こおり","フェアリー"],
+
+  "イワパレス":["むし","いわ"],
+  "ウッウ":["みず","ひこう"],
+  "エースバーン":["ほのお"],
+  "カイリキー":["かくとう"],
+  "カビゴン":["ノーマル"],
+  "ゲッコウガ":["みず","あく"],
+  "ファイアロー":["ほのお","ひこう"],
+  "ガブリアス":["ドラゴン","じめん"],
+  "ゲンガー":["ゴースト","どく"],
+  "ピカチュウ":["でんき"],
+  "リザードン":["ほのお","ひこう"],
+  "フシギバナ":["くさ","どく"],
+  "ルカリオ":["かくとう","はがね"],
+  "バリヤード":["エスパー","フェアリー"],
+  "ヤドラン":["みず","エスパー"],
+  "プクリン":["ノーマル","フェアリー"]
+
+};
+
+/* =========================================================
+   世代データ
+   今回指定された世代構成をそのまま反映
+========================================================= */
+
+const generations = {
+
+  "第1世代（カントー）": [
+    "メガリザードンY",
+    "メガギャラドス",
+    "フリーザー",
+    "ファイヤー",
+    "サンダー",
+    "ニャース",
+    "シャワーズ",
+    "メガリザードンX",
+    "ミュウツーX",
+    "ミュウツーY",
+    "ラプラス",
+    "ミュウ",
+    "ピクシー",
+    "カメックス",
+    "カイリキー",
+    "カビゴン",
+    "ゲンガー",
+    "ピカチュウ",
+    "リザードン",
+    "フシギバナ",
+    "バリヤード",
+    "ヤドラン",
+    "プクリン",
+    "ギャラドス",
+    "コダック",
+    "カイリュー"
+  ],
+
+  "第2世代（ジョウト）": [
+    "メガニウム",
+    "オーダイル",
+    "バクフーン",
+    "ブラッキー",
+    "エーフィ",
+    "マリルリ",
+    "ハピナス",
+    "バンギラス",
+    "スイクン",
+    "ホウオウ",
+    "ハッサム"
+  ],
+
+  "第3世代（ホウエン）": [
+    "バシャーモ",
+    "ラティアス",
+    "ラティオス",
+    "メタグロス",
+    "アブソル",
+    "サーナイト",
+    "ヤミラミ"
+  ],
+
+  "第4世代（シンオウ）": [
+    "エンペルト",
+    "リーフィア",
+    "グレイシア",
+    "ガブリアス",
+    "ルカリオ",
+    "メガルカリオ",
+    "パルキア",
+    "ダークライ",
+    "マンムー"
+  ],
+
+  "第5世代（イッシュ）": [
+    "レシラム",
+    "ゾロアーク",
+    "シャンデラ",
+    "イワパレス"
+  ],
+
+  "第6世代（カロス）": [
+    "マフォクシー",
+    "ゲッコウガ",
+    "ファイアロー",
+    "ニンフィア",
+    "ヌメルゴン",
+    "イベルタル",
+    "フーパ",
+    "ギルガルド",
+    "オーロット"
+  ],
+
+  "第7世代（アローラ）": [
+    "アローラライチュウ",
+    "アローラキュウコン",
+    "マッシブーン",
+    "ミミッキュ",
+    "ダダリン",
+    "ソルガレオ",
+    "ジュナイパー",
+    "アマージョ",
+    "キュワワー"
+  ],
+
+  "第8世代（ガラル）": [
+    "ネギガナイト",
+    "ガラルギャロップ",
+    "インテレオン",
+    "ウーラオス",
+    "ザシアン",
+    "ドラパルト",
+    "ヨクバリス",
+    "ウッウ",
+    "エースバーン",
+    "マホイップ",
+    "タイレーツ",
+    "ジュラルドン"
+  ],
+
+  "第9世代（パルデア）": [
+    "ウェーニバル",
+    "ラウドボーン",
+    "パーモット",
+    "デカヌチャン",
+    "グレンアルマ",
+    "ソウブレイズ",
+    "ミライドン",
+    "マスカーニャ"
+  ]
+
+};
+
+/* =========================================================
+   特殊テーマ
+========================================================= */
+
+/*
+ * パートナーポケモン
+ *
+ * 今回指定された15匹のみ。
+ */
+
+const starterPokemon = [
+
+  "フシギバナ",
+  "リザードン",
+  "カメックス",
+  "ゲッコウガ",
+  "エースバーン",
+  "ジュナイパー",
+  "インテレオン",
+  "マフォクシー",
+  "バシャーモ",
+  "ウェーニバル",
+  "エンペルト",
+  "メガニウム",
+  "オーダイル",
+  "バクフーン",
+  "ラウドボーン"
+
+];
+
+/*
+ * 大器晩成ポケモン
+ *
+ * 指定された5匹のみ。
+ */
+
+const lateBloomers = [
+
+  "カイリュー",
+  "バンギラス",
+  "メタグロス",
+  "ガブリアス",
+  "ヌメルゴン"
+
+];
+
+/* =========================================================
+   イーブイフレンズ
+========================================================= */
+
+const eeveelutions = [
+
+  "エーフィ",
+  "ブラッキー",
+  "ニンフィア",
+  "リーフィア",
+  "グレイシア",
+  "シャワーズ"
+
+];
+
+/* =========================================================
+   伝説・幻
+========================================================= */
+
+const legendaryPokemon = [
+
+  "ソルガレオ",
+  "レシラム",
+  "パルキア",
+  "イベルタル",
+  "フリーザー",
+  "ファイヤー",
+  "サンダー",
+  "スイクン",
+  "ダークライ",
+  "ホウオウ",
+  "ミライドン",
+  "ミュウツーX",
+  "ミュウツーY",
+  "ザシアン",
+  "ミュウ",
+  "フーパ"
+
+];
+
+/* =========================================================
+   金バッジ
+========================================================= */
+
+const goldBadgePokemon = [
+
+  "バンギラス",
+  "マッシブーン",
+  "カメックス",
+  "インテレオン",
+  "ミミッキュ"
+
+];
+
+/* =========================================================
+   チャレンジカテゴリ
+========================================================= */
+
+const challengeCategories = [
+
+  {
+    name: "ロール統一",
+    weight: 25,
+
+    challenges: [
+
+      {
+        title: "アタッカー統一",
+        filter: p =>
+          roles[p] === "アタッカー"
+      },
+
+      {
+        title: "ディフェンダー統一",
+        filter: p =>
+          roles[p] === "ディフェンダー"
+      },
+
+      {
+        title: "サポート型統一",
+        filter: p =>
+          roles[p] === "サポート型"
+      },
+
+      {
+        title: "スピード型統一",
+        filter: p =>
+          roles[p] === "スピード型"
+      },
+
+      {
+        title: "バランス型統一",
+        filter: p =>
+          roles[p] === "バランス型"
+      }
+
+    ]
+  },
+
+  {
+    name: "タイプ統一",
+    weight: 25,
+
+    challenges: [
+
+      {
+        title: "ほのおタイプ統一",
+        filter: p =>
+          types[p]?.includes("ほのお")
+      },
+
+      {
+        title: "みずタイプ統一",
+        filter: p =>
+          types[p]?.includes("みず")
+      },
+
+      {
+        title: "くさタイプ統一",
+        filter: p =>
+          types[p]?.includes("くさ")
+      },
+
+      {
+        title: "でんきタイプ統一",
+        filter: p =>
+          types[p]?.includes("でんき")
+      },
+
+      {
+        title: "ひこうタイプ統一",
+        filter: p =>
+          types[p]?.includes("ひこう")
+      },
+
+      {
+        title: "ドラゴンタイプ統一",
+        filter: p =>
+          types[p]?.includes("ドラゴン")
+      }
+
+    ]
+  },
+
+  {
+    name: "特殊テーマ",
+    weight: 15,
+
+    challenges: [
+
+      {
+        title: "パートナーポケモン統一",
+        filter: p =>
+          starterPokemon.includes(p)
+      },
+
+      {
+        title: "大器晩成統一",
+        filter: p =>
+          lateBloomers.includes(p)
+      }
+
+    ]
+  },
+
+  {
+    name: "イーブイフレンズ統一",
+    weight: 5,
+
+    challenges: [
+
+      {
+        title: "イーブイフレンズ統一",
+        filter: p =>
+          eeveelutions.includes(p)
+      }
+
+    ]
+  },
+
+  {
+    name: "世代統一",
+    weight: 25,
+
+    challenges:
+      Object.entries(
+        generations
+      ).map(
+        ([generation, list]) => ({
+
+          title:
+            generation,
+
+          filter: p =>
+            list.includes(p)
+
+        })
+      )
+  },
+
+  {
+    name: "レア枠",
+    weight: 5,
+
+    challenges: [
+
+      {
+        title: "伝説・幻ポケモン統一",
+
+        filter: p =>
+          legendaryPokemon.includes(p),
+
+        rare: true
+      },
+
+      {
+        title: "金バッジ",
+
+        filter: p =>
+          goldBadgePokemon.includes(p),
+
+        rare: true
+      }
+
+    ]
+  }
+
+];
+
+/* =========================================================
+   要素
+========================================================= */
+
+const canvas =
+  document.getElementById("wheel");
+
+const ctx =
+  canvas.getContext("2d");
+
+const spinButton =
+  document.getElementById("spin");
+
+const topResult =
+  document.getElementById("topResult");
+
+const historyList =
+  document.getElementById("historyList");
+
+const completeMessage =
+  document.getElementById("completeMessage");
+
+const challengeButton =
+  document.getElementById("challengeButton");
+
+const challengeResult =
+  document.getElementById("challengeResult");
+
+const modeTeamButton =
+  document.getElementById("modeTeam");
+
+const modeChallengeButton =
+  document.getElementById("modeChallenge");
+
+/* =========================================================
+   モード
+========================================================= */
+
+function setMode(mode) {
+
+  const challengeMode =
+    mode === "challenge";
+
+  document.body.classList.toggle(
+    "challenge-mode",
+    challengeMode
+  );
+
+  modeTeamButton.classList.toggle(
+    "active",
+    !challengeMode
+  );
+
+  modeChallengeButton.classList.toggle(
+    "active",
+    challengeMode
+  );
+
+  modeTeamButton.setAttribute(
+    "aria-selected",
+    String(!challengeMode)
+  );
+
+  modeChallengeButton.setAttribute(
+    "aria-selected",
+    String(challengeMode)
+  );
+
+}
+
+modeTeamButton.addEventListener(
+  "click",
+  () => {
+    setMode("team");
+  }
+);
+
+modeChallengeButton.addEventListener(
+  "click",
+  () => {
+    setMode("challenge");
+  }
+);
+
+/* =========================================================
+   状態
+========================================================= */
+
+let selectedHistory = [];
+
+let available = [
+  ...pokemon
+];
+
+let rotation = 0;
+
+let spinning = false;
+
+let teamCompleted = false;
+
+/* =========================================================
+   Canvas
+========================================================= */
+
+function resizeCanvas() {
+
+  const size =
+    Math.min(
+      canvas.clientWidth,
+      canvas.clientHeight
+    );
+
+  const ratio =
+    window.devicePixelRatio || 1;
+
+  canvas.width =
+    size * ratio;
+
+  canvas.height =
+    size * ratio;
+
+  ctx.setTransform(
+    ratio,
+    0,
+    0,
+    ratio,
+    0,
+    0
+  );
+
+  drawWheel();
+
+}
+
+resizeCanvas();
+
+window.addEventListener(
+  "resize",
+  resizeCanvas
+);
+
+/* =========================================================
+   ルーレット描画
+========================================================= */
+
+function drawWheel() {
+
+  const size =
+    canvas.clientWidth;
+
+  const center =
+    size / 2;
+
+  const radius =
+    size / 2 - 8;
+
+  ctx.clearRect(
+    0,
+    0,
+    size,
+    size
+  );
+
+  const count =
+    pokemon.length;
+
+  const angle =
+    (Math.PI * 2) /
+    count;
+
+  ctx.save();
+
+  ctx.translate(
+    center,
+    center
+  );
+
+  ctx.rotate(rotation);
+
+  const colors = [
+    "#1976b9",
+    "#f39a2f",
+    "#4c9bd1",
+    "#e96f27",
+    "#2e7fba",
+    "#f4ad46"
+  ];
+
+  for (
+    let i = 0;
+    i < count;
+    i++
+  ) {
+
+    const start =
+      i * angle;
+
+    const end =
+      start + angle;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+      0,
+      0
+    );
+
+    ctx.arc(
+      0,
+      0,
+      radius,
+      start,
+      end
+    );
+
+    ctx.closePath();
+
+    ctx.fillStyle =
+      colors[
+        i % colors.length
+      ];
+
+    ctx.fill();
+
+    ctx.strokeStyle =
+      "rgba(255,255,255,.45)";
+
+    ctx.lineWidth = 1;
+
+    ctx.stroke();
+
+  }
+
+  ctx.beginPath();
+
+  ctx.arc(
+    0,
+    0,
+    radius * .16,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fillStyle =
+    "#ffffff";
+
+  ctx.fill();
+
+  ctx.lineWidth = 5;
+
+  ctx.strokeStyle =
+    "#173e69";
+
+  ctx.stroke();
+
+  ctx.restore();
+
+}
+
+/* =========================================================
+   ルーレット
+========================================================= */
+
+spinButton.addEventListener(
+  "click",
+  () => {
+
+    if (teamCompleted) {
+
+      startNewTeam();
+
+      return;
+
+    }
+
+    spin();
+
+  }
+);
+
+function spin() {
+
+  if (
+    spinning ||
+    available.length === 0
+  ) {
+
+    return;
+
+  }
+
+  spinning = true;
+
+  spinButton.disabled =
+    true;
+
+  topResult.innerHTML =
+    "回転中…";
+
+  const selectedIndex =
+    Math.floor(
+      Math.random() *
+      available.length
+    );
+
+  const selectedPokemon =
+    available[
+      selectedIndex
+    ];
+
+  const pokemonIndex =
+    pokemon.indexOf(
+      selectedPokemon
+    );
+
+  const segmentAngle =
+    (Math.PI * 2) /
+    pokemon.length;
+
+  const targetAngle =
+    -(
+      pokemonIndex *
+      segmentAngle
+      +
+      segmentAngle / 2
+    );
+
+  const extraRotation =
+    Math.PI * 2 *
+    (
+      5 +
+      Math.floor(
+        Math.random() * 3
+      )
+    );
+
+  const startRotation =
+    rotation;
+
+  let finalRotation =
+    targetAngle +
+    extraRotation;
+
+  while (
+    finalRotation <=
+    startRotation
+  ) {
+
+    finalRotation +=
+      Math.PI * 2;
+
+  }
+
+  const duration =
+    3000;
+
+  const startTime =
+    performance.now();
+
+  function animate(now) {
+
+    const elapsed =
+      now - startTime;
+
+    const progress =
+      Math.min(
+        elapsed / duration,
+        1
+      );
+
+    const eased =
+      1 -
+      Math.pow(
+        1 - progress,
+        3
+      );
+
+    rotation =
+      startRotation +
+      (
+        finalRotation -
+        startRotation
+      ) *
+      eased;
+
+    drawWheel();
+
+    if (
+      progress < 1
+    ) {
+
+      requestAnimationFrame(
+        animate
+      );
+
+    } else {
+
+      finishSpin(
+        selectedPokemon,
+        selectedIndex
+      );
+
+    }
+
+  }
+
+  requestAnimationFrame(
+    animate
+  );
+
+}
+
+/* =========================================================
+   抽選終了
+========================================================= */
+
+function finishSpin(
+  selectedPokemon,
+  selectedIndex
+) {
+
+  available.splice(
+    selectedIndex,
+    1
+  );
+
+  const icon =
+    iconUrl(
+      selectedPokemon
+    );
+
+  topResult.innerHTML = `
+
+    ${
+      icon
+        ? `
+          <img
+            src="${icon}"
+            alt="${selectedPokemon}"
+            onerror="
+              this.style.display='none'
+            "
+          >
+        `
+        : ""
+    }
+
+    <div class="single-name">
+      ${selectedPokemon}
+    </div>
+
+  `;
+
+  selectedHistory.push(
+    selectedPokemon
+  );
+
+  renderHistory();
+
+  /*
+   * 5人揃ったら、
+   * 次のクリックで新しい5人を開始。
+   */
+
+  if (
+    selectedHistory.length >= 5
+  ) {
+
+    teamCompleted =
+      true;
+
+    completeMessage.style.display =
+      "block";
+
+    available = [
+      ...pokemon
+    ];
+
+    spinning = false;
+
+    spinButton.disabled =
+      false;
+
+    spinButton.textContent =
+      "🔄 次の5人を選ぶ";
+
+    return;
+
+  }
+
+  spinning = false;
+
+  spinButton.disabled =
+    false;
+
+}
+
+/* =========================================================
+   新しい5人を開始
+========================================================= */
+
+function startNewTeam() {
+
+  if (spinning) {
+    return;
+  }
+
+  selectedHistory = [];
+
+  available = [
+    ...pokemon
+  ];
+
+  teamCompleted =
+    false;
+
+  topResult.innerHTML =
+    "？？？";
+
+  completeMessage.style.display =
+    "none";
+
+  spinButton.textContent =
+    "🎲 ルーレットを回す！";
+
+  renderHistory();
+
+  spin();
+
+}
+
+/* =========================================================
+   履歴表示
+========================================================= */
+
+function renderHistory() {
+
+  historyList.innerHTML =
+    "";
+
+  selectedHistory.forEach(
+    (name, index) => {
+
+      const item =
+        document.createElement(
+          "div"
+        );
+
+      item.className =
+        "history-item";
+
+      const role =
+        roles[name] ||
+        "未設定";
+
+      const icon =
+        iconUrl(name);
+
+      item.innerHTML = `
+
+        <span class="num">
+          ${index + 1}人目
+        </span>
+
+        ${
+          icon
+            ? `
+              <img
+                class="pokemon-icon"
+                src="${icon}"
+                alt="${name}"
+                onerror="
+                  this.style.display='none'
+                "
+              >
+            `
+            : ""
+        }
+
+        <span
+          class="role-badge ${roleClass(role)}"
+        >
+          ${role}
+        </span>
+
+        <span class="name">
+          ${name}
+        </span>
+
+      `;
+
+      historyList.appendChild(
+        item
+      );
+
+    }
+  );
+
+}
+
+/* =========================================================
+   ロールクラス
+========================================================= */
+
+function roleClass(role) {
+
+  const classes = {
+
+    "アタッカー":
+      "attacker",
+
+    "ディフェンダー":
+      "defender",
+
+    "サポート型":
+      "supporter",
+
+    "スピード型":
+      "speedster",
+
+    "バランス型":
+      "allrounder"
+
+  };
+
+  return classes[
+    role
+  ] || "";
+
+}
+
+/* =========================================================
+   アイコンURL
+========================================================= */
+
+function iconUrl(name) {
+
+  const id =
+    iconNames[name];
+
+  if (!id) {
+    return "";
+  }
+
+  return (
+    "https://img.pokemondb.net/sprites/home/normal/"
+    + id +
+    ".png"
+  );
+
+}
+
+/* =========================================================
+   本日のチャレンジ
+========================================================= */
+
+challengeButton.addEventListener(
+  "click",
+  createChallenge
+);
+
+/* =========================================================
+   重み付きカテゴリ抽選
+========================================================= */
+
+function weightedRandomCategory() {
+
+  const totalWeight =
+    challengeCategories.reduce(
+      (
+        total,
+        category
+      ) =>
+        total +
+        category.weight,
+      0
+    );
+
+  let random =
+    Math.random() *
+    totalWeight;
+
+  for (
+    const category
+    of challengeCategories
+  ) {
+
+    random -=
+      category.weight;
+
+    if (
+      random <= 0
+    ) {
+
+      return category;
+
+    }
+
+  }
+
+  return challengeCategories[
+    challengeCategories.length - 1
+  ];
+
+}
+
+/* =========================================================
+   本日のお題作成
+========================================================= */
+
+function createChallenge() {
+
+  challengeResult.innerHTML =
+    "";
+
+  challengeResult.classList.remove(
+    "rare-challenge"
+  );
+
+  const category =
+    weightedRandomCategory();
+
+  /*
+   * カテゴリ内からお題を1つ選択
+   */
+
+  const validChallenges =
+    category.challenges.filter(
+      challenge => {
+
+        const candidates =
+          pokemon.filter(
+            challenge.filter
+          );
+
+        return candidates.length >= 5;
+
+      }
+    );
+
+  if (
+    validChallenges.length === 0
+  ) {
+
+    return;
+
+  }
+
+  const challenge =
+    validChallenges[
+      Math.floor(
+        Math.random() *
+        validChallenges.length
+      )
+    ];
+
+  /*
+   * お題に該当するポケモンを取得
+   */
+
+  const candidates =
+    pokemon.filter(
+      challenge.filter
+    );
+
+  /*
+   * その中から5匹をランダム抽選
+   * 同じポケモンは重複しない。
+   */
+
+  const selected =
+    shuffle(
+      candidates
+    ).slice(
+      0,
+      5
+    );
+
+  renderChallenge(
+    category,
+    challenge,
+    selected
+  );
+
+}
+
+/* =========================================================
+   配列シャッフル
+========================================================= */
+
+function shuffle(array) {
+
+  const result =
+    [...array];
+
+  for (
+    let i =
+      result.length - 1;
+    i > 0;
+    i--
+  ) {
+
+    const j =
+      Math.floor(
+        Math.random() *
+        (i + 1)
+      );
+
+    [
+      result[i],
+      result[j]
+    ] = [
+      result[j],
+      result[i]
+    ];
+
+  }
+
+  return result;
+
+}
+
+/* =========================================================
+   チャレンジ表示
+========================================================= */
+
+function renderChallenge(
+  category,
+  challenge,
+  selected
+) {
+
+  const isRare =
+    challenge.rare === true;
+
+  challengeResult.classList.toggle(
+    "rare-challenge",
+    isRare
+  );
+
+  const rareBanner =
+    isRare
+      ? `
+        <div class="legend-banner">
+          ✨ LEGEND CHALLENGE ✨
+        </div>
+      `
+      : "";
+
+  const pokemonHTML =
+    selected
+      .map(
+        name => {
+
+          const icon =
+            iconUrl(name);
+
+          return `
+
+            <div class="challenge-pokemon">
+
+              ${
+                icon
+                  ? `
+                    <img
+                      src="${icon}"
+                      alt="${name}"
+                      onerror="
+                        this.style.display='none'
+                      "
+                    >
+                  `
+                  : ""
+              }
+
+              <span>
+                ${name}
+              </span>
+
+            </div>
+
+          `;
+
+        }
+      )
+      .join("");
+
+  challengeResult.innerHTML = `
+
+    ${rareBanner}
+
+    <div class="challenge-heading">
+
+      <div class="challenge-label">
+        本日のチャレンジ
+      </div>
+
+      <div class="challenge-title">
+        ${challenge.title}
+      </div>
+
+      <div class="challenge-category">
+        【カテゴリ】${category.name}
+      </div>
+
+    </div>
+
+    <div class="challenge-pokemon-title">
+      対象ポケモン
+    </div>
+
+    <div class="challenge-pokemon-list">
+      ${pokemonHTML}
+    </div>
+
+  `;
+
+}
+
+</script>
+
+</body>
+</html>
